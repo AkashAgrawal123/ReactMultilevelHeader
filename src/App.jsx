@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import "./App.scss";
-import Navbar from "./Navbar";
+import "./Styles/App.scss";
+import Navbar from "./Components/Navbar";
 
 const App = () => {
   return (
