@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "../Styles/Navbar.scss";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoSearchOutline } from "react-icons/io5";
@@ -8,6 +8,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import { SidebarMenuData } from "../Data/SidebarMenuData";
 import { CgClose } from "react-icons/cg";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
+import axios from "axios";
 
 const Navbar = () => {
   const [isSidebarMinimised, setIsSidebarMinimised] = useState(false);
@@ -19,6 +20,18 @@ const Navbar = () => {
     useState(null);
   const [closePanelOverlay, setClosePanelOverlay] = useState(true);
   const [curActiveArray, setCurActiveArray] = useState([]);
+  const [navData, setNavData] = useState(null);
+  const [curPageIndex, setCurPageIndex] = useState(null);
+  const [activePageData, setActivePageData] = useState(null);
+
+  const sidebarRef = useRef(null);
+  const navPanelRef = useRef(null);
+  const componentRef = useRef(null);
+
+  const isDesktopDesign = 992;
+  const safePanelHeight = (window.innerHeight = 71);
+
+  console.log(safePanelHeight, "safePanelHeight");
 
   const handleHumburgerClick = () => {
     setIsSidebarMinimised((prev) => !prev);
@@ -67,32 +80,103 @@ const Navbar = () => {
     return { transform: `translateX(${transformLeft}%)` };
   };
 
+  const mobileNavPositionTransform = () => {
+    const transformLeft = `${curActiveArray.length * -100}`;
+    return { transform: `translateX(${transformLeft}%)` };
+  };
+
+  const desktopNavPositionTransform = () => {
+    if (!isSidebarMinimised) {
+      return { transform: `translateX(0)` };
+    }
+
+    const leftFactor = curActiveArray.length + 1;
+
+    const transformLeft = `${leftFactor * -100}`;
+    return { transform: `translateX(${transformLeft}%)` };
+  };
+
+  const handleOverlayClick = (e) => {
+    const clickOutsideSidebar =
+      sidebarRef &&
+      sidebarRef.current &&
+      !sidebarRef.current.contains(e.target);
+    const clickOutsideNavPanels =
+      navPanelRef &&
+      navPanelRef.current &&
+      !navPanelRef.current.contains(e.target);
+
+    if (clickOutsideSidebar && clickOutsideNavPanels) {
+      setClosePanelOverlay(true);
+    }
+  };
+
+  const handleNavKeyDown = (e) => {
+    if (e.code === "Escape") {
+      setClosePanelOverlay(true);
+    }
+  };
+
+  const closeOverlay = () => {
+    setCurActiveArray([]);
+    setClosePanelOverlay(false);
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", (e) => handleOverlayClick(e));
+    document.addEventListener("keydown", (e) => handleNavKeyDown(e));
+
+    return () => {
+      document.addEventListener("mousedown", (e) => handleOverlayClick(e));
+      document.addEventListener("keydown", (e) => handleNavKeyDown(e));
+    };
+  }, []);
+
+  useEffect(() => {
+    if (closePanelOverlay) {
+      closeOverlay();
+    }
+  }, [closePanelOverlay]);
+
+  useEffect(() => {
+    const rootElement = document.querySelector("#root");
+
+    if (isSidebarMinimised) {
+      rootElement.classList.add("sidebar-is-minimised");
+    } else {
+      rootElement.classList.remove("sidebar-is-minimised");
+    }
+  }, [isSidebarMinimised]);
+
+  const sidebarHTML = isDesktopDesign ? (
+    <div className="sidebar__header" ref={sidebarRef}>
+      <div className="sidebar__min-logo">
+        <i className="fa-brands fa-wordpress sidebar__logo-icon"></i>
+      </div>
+      <button
+        className="sidebar__button sidebar__button--min-max-button"
+        onClick={handleHumburgerClick}
+      >
+        <RxHamburgerMenu className="icon sidebar__hambuger-icon" />
+      </button>
+      <button className="sidebar__button sidebar__button--search">
+        <IoSearchOutline className="icon sidebar__search-icon" />
+      </button>
+    </div>
+  ) : (
+    <div>Please open tablet or mobile view</div>
+  );
+
   return (
     <>
       <section className="sidebar" id="react-nav">
-        <nav aria-label="Site navigation">
+        <nav aria-label="Site navigation" ref={componentRef}>
           <div
             className={`sidebar__inner ${
               isSidebarMinimised ? "sidebar__inner--minimised" : ""
             } ${activeMainMenuItem ? "sidebar__inner--is-visible" : ""}`}
           >
-            {/* hamburger header */}
-            <div className="sidebar__header">
-              <div className="sidebar__min-logo">
-                <i className="fa-brands fa-wordpress sidebar__logo-icon"></i>
-              </div>
-              <button
-                className="sidebar__button sidebar__button--min-max-button"
-                onClick={handleHumburgerClick}
-              >
-                <RxHamburgerMenu className="icon sidebar__hambuger-icon" />
-              </button>
-              <button className="sidebar__button sidebar__button--search">
-                <IoSearchOutline className="icon sidebar__search-icon" />
-              </button>
-            </div>
-
-            {/* top-level panel */}
+            {sidebarHTML}
             <div
               className="sidebar__panels"
               style={{

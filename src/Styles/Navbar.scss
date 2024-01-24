@@ -395,6 +395,12 @@
       transition: 0.25s border-color ease-in;
     }
   }
+
+  &-is-minimised {
+    .sidebar__close-menu-button-wrap {
+      display: none;
+    }
+  }
 }
 
 .sidebar__item:not(span):not(.sidebar__item--footer-link):hover:not(
