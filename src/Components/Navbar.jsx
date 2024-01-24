@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import "./Navbar.scss";
+import "../Styles/Navbar.scss";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoSearchOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { RiWechatLine } from "react-icons/ri";
 import { IoIosArrowForward } from "react-icons/io";
-import { SidebarMenuData } from "./SidebarMenuData";
+import { SidebarMenuData } from "../Data/SidebarMenuData";
 import { CgClose } from "react-icons/cg";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
 
