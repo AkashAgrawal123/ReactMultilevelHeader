@@ -8,7 +8,6 @@ import { IoIosArrowForward } from "react-icons/io";
 import { SidebarMenuData } from "../Data/SidebarMenuData";
 import { CgClose } from "react-icons/cg";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
-import axios from "axios";
 import Headroom from "react-headroom";
 import { windowScrollHandlerInstance } from "../Utils/WindowScrollHandler";
 import { FaArrowLeft } from "react-icons/fa6";
@@ -35,19 +34,34 @@ const Navbar = () => {
   const isDesktopDesign = 992;
   const safePanelHeight = (window.innerHeight = 71);
 
-  console.log(safePanelHeight, "safePanelHeight");
+  const rootElement = document.querySelector("#root");
 
   const handleHumburgerClick = () => {
+    const isSearchOpen = rootElement.classList.contains("main-search-is-open");
+
     setIsSidebarMinimised((prev) => !prev);
+
+    if (isSearchOpen) {
+      rootElement.classList.remove("main-search-is-open");
+    }
   };
 
   const handleSearchClick = (e) => {
     e.preventDefault();
 
-    if (getIsSearchOpen) {
-      closeSearch();
-    } else {
-      openSearch();
+    const sidebarInner = document.querySelector(".sidebar__inner");
+
+    rootElement.classList.toggle("main-search-is-open");
+
+    rootElement.classList.remove("sidebar-is-minimised");
+
+    if (sidebarInner) {
+      sidebarInner.classList.remove("sidebar__inner--is-visible");
+    }
+
+    const sidebarPanels = document.querySelector(".sidebar__panels");
+    if (sidebarPanels) {
+      sidebarPanels.style.transform = "translateX(0px)";
     }
   };
 
@@ -60,39 +74,21 @@ const Navbar = () => {
     }
   };
 
-  const getIsSearchOpen = () => {
-    const rootElement = document.querySelector("#root");
-    const searchCurrentlyOpen = rootElement.classList.contains(
-      "main-search-is-open"
-    );
-    return searchCurrentlyOpen;
-  };
-
-  const closeSearch = () => {
-    const rootElement = document.querySelector("#root");
-    if (!rootElement) {
-      return;
-    }
-    rootElement.classList.remove("main-search-is-open");
-  };
-
-  const openSearch = () => {
-    const rootElement = document.querySelector("#root");
-    if (!rootElement) {
-      return;
-    }
-    rootElement.classList.add("main-search-is-open");
-
-    setCurActiveArray([]);
-    setClosePanelOverlay(true);
-  };
-
   const handleMainMenuItemClick = (mainMenuItemId) => {
     setActiveMainMenuItem(mainMenuItemId);
     setActiveSubmenuItem(null);
     setActiveSubmenuItemThirdLevel(null);
     setActiveSubmenuItemForthLevel(null);
     setCurActiveArray([mainMenuItemId]);
+
+    const rootElement = document.querySelector('#root');
+    const sidebarInner = document.querySelector('.sidebar__inner');
+
+    rootElement.classList.remove("main-search-is-open");
+
+    if(sidebarInner) {
+      sidebarInner.classList.add("sidebar__inner--is-visible");
+    }
   };
 
   const handleSubmenuItemClick = (subMenuItemId) => {
@@ -222,12 +218,21 @@ const Navbar = () => {
   }, [closePanelOverlay]);
 
   useEffect(() => {
-    const rootElement = document.querySelector("#root");
 
     if (isSidebarMinimised) {
       rootElement.classList.add("sidebar-is-minimised");
     } else {
       rootElement.classList.remove("sidebar-is-minimised");
+    }
+  }, [isSidebarMinimised]);
+
+  useEffect(() => {
+    const sidebarInner = document.querySelector(".sidebar__inner");
+
+    if (sidebarInner.classList.contains(".sidebar__inner--is-visible")) {
+      if (rootElement.classList.contains(".main-search-is-open")) {
+        rootElement.classList.remove("main-search-is-open");
+      }
     }
   }, [isSidebarMinimised]);
 
