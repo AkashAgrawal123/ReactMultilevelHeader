@@ -47,3 +47,10 @@ svg {
     min-height: 100%;
   }
 }
+
+.container {
+  flex-grow: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
