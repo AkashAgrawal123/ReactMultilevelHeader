@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import "../Styles/Navbar.scss";
+import axios from "../Mock/axiosMockAdapter";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoSearchOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { RiWechatLine } from "react-icons/ri";
 import { IoIosArrowForward } from "react-icons/io";
-import { SidebarMenuData } from "../Data/SidebarMenuData";
 import { CgClose } from "react-icons/cg";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import Headroom from "react-headroom";
@@ -23,16 +23,22 @@ const Navbar = () => {
   const [closePanelOverlay, setClosePanelOverlay] = useState(true);
   const [curActiveArray, setCurActiveArray] = useState([]);
   const [showMobileNav, setShowMobileNav] = useState(false);
-  const [navData, setNavData] = useState(null);
+  const [navData, setNavData] = useState([]);
   const [curPageIndex, setCurPageIndex] = useState(null);
   const [activePageData, setActivePageData] = useState(null);
+
+  const endpointsData = JSON.parse(
+    document.querySelector('script[data-config-id="endpoints"]').textContent
+  );
 
   const sidebarRef = useRef(null);
   const navPanelRef = useRef(null);
   const componentRef = useRef(null);
 
   const isDesktopDesign = 992;
-  const safePanelHeight = (window.innerHeight = 71);
+  const desktopInnerWidth = window.innerWidth;
+
+  const safePanelHeight = window.innerHeight - 71;
 
   const rootElement = document.querySelector("#root");
 
@@ -51,6 +57,8 @@ const Navbar = () => {
 
     const sidebarInner = document.querySelector(".sidebar__inner");
 
+    const sidebarPanel = document.querySelector(".sidebar__panel--sub");
+
     rootElement.classList.toggle("main-search-is-open");
 
     rootElement.classList.remove("sidebar-is-minimised");
@@ -59,19 +67,18 @@ const Navbar = () => {
       sidebarInner.classList.remove("sidebar__inner--is-visible");
     }
 
+    if (sidebarPanel) {
+      sidebarPanel.classList.remove("sidebar__panel--is-active");
+    }
+
     const sidebarPanels = document.querySelector(".sidebar__panels");
     if (sidebarPanels) {
       sidebarPanels.style.transform = "translateX(0px)";
     }
   };
 
-  const handleSubMenuButtonClick = (e) => {
-    e.preventDefault();
-
-    if (curActiveArray.length > 0) {
-      setCurActiveArray([]);
-      return;
-    }
+  const handleBackButtonItemClick = (e) => {
+    console.log("clicke");
   };
 
   const handleMainMenuItemClick = (mainMenuItemId) => {
@@ -81,13 +88,16 @@ const Navbar = () => {
     setActiveSubmenuItemForthLevel(null);
     setCurActiveArray([mainMenuItemId]);
 
-    const rootElement = document.querySelector('#root');
-    const sidebarInner = document.querySelector('.sidebar__inner');
+    const sidebarInner = document.querySelector(".sidebar__inner");
+    const sidebarPanel = document.querySelector(".sidebar__panel--sub");
 
     rootElement.classList.remove("main-search-is-open");
 
-    if(sidebarInner) {
+    if (sidebarInner) {
       sidebarInner.classList.add("sidebar__inner--is-visible");
+    }
+    if (sidebarPanel) {
+      sidebarPanel.classList.add("sidebar__panel--is-active");
     }
   };
 
@@ -179,6 +189,24 @@ const Navbar = () => {
     document.body.classList.remove("nav--un-pinned");
   };
 
+  // data fetch using axios
+  useEffect(() => {
+    if (!endpointsData || !endpointsData.nav) {
+      console.log("wrong URL");
+      return;
+    }
+
+    axios
+      .get(endpointsData.nav)
+      .then((response) => {
+        console.log(response.data.navData);
+        setNavData(response.data.navData);
+      })
+      .catch((error) => {
+        console.log(error, "error");
+      });
+  }, []);
+
   useEffect(() => {
     if (!showMobileNav) {
       setCurActiveArray([]);
@@ -218,7 +246,6 @@ const Navbar = () => {
   }, [closePanelOverlay]);
 
   useEffect(() => {
-
     if (isSidebarMinimised) {
       rootElement.classList.add("sidebar-is-minimised");
     } else {
@@ -236,61 +263,68 @@ const Navbar = () => {
     }
   }, [isSidebarMinimised]);
 
-  const sidebarHTML = isDesktopDesign ? (
-    <div className="sidebar__header" ref={sidebarRef}>
-      <div className="sidebar__min-logo">
-        <i
-          name="logo-min"
-          className="fa-brands fa-wordpress sidebar__logo-icon"
-        ></i>
-      </div>
-      <button
-        className="sidebar__button sidebar__button--min-max-button"
-        onClick={handleHumburgerClick}
-      >
-        <RxHamburgerMenu name="menu" className="icon sidebar__hambuger-icon" />
-      </button>
-      <button
-        className="sidebar__button sidebar__button--search"
-        aria-label="Open search"
-        onClick={handleSearchClick}
-      >
-        <IoSearchOutline
-          name={showMobileNav ? "close" : "search"}
-          className="icon sidebar__search-icon"
-        />
-      </button>
-    </div>
-  ) : (
-    <Headroom
-      disableInlineStyles
-      pinStart={71}
-      onUnpin={() => mobileNavUnpinned()}
-      onPin={() => mobileNavPinned()}
-    >
+  const sidebarHTML =
+    desktopInnerWidth > 991 ? (
       <div className="sidebar__header" ref={sidebarRef}>
-        <button className="sidebar__hamburger" onClick={handleHumburgerClick}>
+        <div className="sidebar__min-logo">
+          <i
+            name="logo-min"
+            className="fa-brands fa-wordpress sidebar__logo-icon"
+          ></i>
+        </div>
+        <button
+          className="sidebar__button sidebar__button--min-max-button"
+          onClick={handleHumburgerClick}
+        >
           <RxHamburgerMenu
-            name={showMobileNav ? "close" : "menu"}
+            name="menu"
             className="icon sidebar__hambuger-icon"
           />
         </button>
-        <a href="#" className="sidebar__mobile-logo">
-          <img
-            src="/images/rbnz-logo-max.svg"
-            className="sidebar__mobile-logo-img"
-            alt=""
-          />
-        </a>
-        <button className="sidebar__mobile-search" onClick={handleSearchClick}>
+        <button
+          className="sidebar__button sidebar__button--search"
+          aria-label="Open search"
+          onClick={handleSearchClick}
+        >
           <IoSearchOutline
-            name={isSearchPanelOpen ? "close" : "search"}
-            className="icon sidebar__mobile-search-icon"
+            name={showMobileNav ? "close" : "search"}
+            className="icon sidebar__search-icon"
           />
         </button>
       </div>
-    </Headroom>
-  );
+    ) : (
+      <Headroom
+        disableInlineStyles
+        pinStart={71}
+        onUnpin={() => mobileNavUnpinned()}
+        onPin={() => mobileNavPinned()}
+      >
+        <div className="sidebar__header" ref={sidebarRef}>
+          <button className="sidebar__hamburger" onClick={handleHumburgerClick}>
+            <RxHamburgerMenu
+              name={showMobileNav ? "close" : "menu"}
+              className="icon sidebar__hambuger-icon"
+            />
+          </button>
+          <a href="#" className="sidebar__mobile-logo">
+            <img
+              src="/images/rbnz-logo-max.svg"
+              className="sidebar__mobile-logo-img"
+              alt=""
+            />
+          </a>
+          <button
+            className="sidebar__mobile-search"
+            onClick={handleSearchClick}
+          >
+            <IoSearchOutline
+              // name={isSearchPanelOpen ? "close" : "search"}
+              className="icon sidebar__mobile-search-icon"
+            />
+          </button>
+        </div>
+      </Headroom>
+    );
 
   return (
     <>
@@ -325,24 +359,12 @@ const Navbar = () => {
                   className="sidebar__panel-content"
                   aria-label="page navigation"
                 >
-                  {true && (
-                    <button
-                      className="sidebar__item sidebar__item--menu"
-                      onClick={(e) => handleSubMenuButtonClick(e)}
-                    >
-                      <FaArrowLeft
-                        name="arrow"
-                        className="sidebar__item-icon sidebar__item-icon--back"
-                      />
-                      {!isDesktopDesign && <span>Back</span>}
-                    </button>
-                  )}
                   <ul
                     className="sidebar__list"
                     role="menubar"
                     aria-label="page navigation"
                   >
-                    {SidebarMenuData.map((level1Item) => (
+                    {navData.map((level1Item) => (
                       <li
                         className="sidebar__list-item sidebar__list-item--content"
                         role="none"
@@ -414,6 +436,21 @@ const Navbar = () => {
                             }`}
                           >
                             <ul className="sidebar__list" role="menu">
+                              {!isDesktopDesign && (
+                                <button
+                                  role="menuitem"
+                                  className="sidebar__item sidebar__item--back-button"
+                                  onClick={(e) => handleBackButtonItemClick(e)}
+                                >
+                                  <FaArrowLeft
+                                    name="arrow"
+                                    className="sidebar__item-icon sidebar__item-icon--back"
+                                  />
+                                  <span className="sidebar__item-title--back">
+                                    Back
+                                  </span>
+                                </button>
+                              )}
                               {level1Item.children.map((level2Item) => (
                                 <li
                                   className="sidebar__list-item sidebar__list-item--content"
@@ -494,6 +531,23 @@ const Navbar = () => {
                                       }`}
                                     >
                                       <ul className="sidebar__list" role="menu">
+                                        {!isDesktopDesign && (
+                                          <button
+                                            role="menuitem"
+                                            className="sidebar__item sidebar__item--back-button"
+                                            onClick={(e) =>
+                                              handleBackButtonItemClick(e)
+                                            }
+                                          >
+                                            <FaArrowLeft
+                                              name="arrow"
+                                              className="sidebar__item-icon sidebar__item-icon--back"
+                                            />
+                                            <span className="sidebar__item-title--back">
+                                              Back
+                                            </span>
+                                          </button>
+                                        )}
                                         {level2Item.children.map(
                                           (level3Item) => (
                                             <li
@@ -589,6 +643,25 @@ const Navbar = () => {
                                                     className="sidebar__list"
                                                     role="menu"
                                                   >
+                                                    {!isDesktopDesign && (
+                                                      <button
+                                                        role="menuitem"
+                                                        className="sidebar__item sidebar__item--back-button"
+                                                        onClick={(e) =>
+                                                          handleBackButtonItemClick(
+                                                            e
+                                                          )
+                                                        }
+                                                      >
+                                                        <FaArrowLeft
+                                                          name="arrow"
+                                                          className="sidebar__item-icon sidebar__item-icon--back"
+                                                        />
+                                                        <span className="sidebar__item-title--back">
+                                                          Back
+                                                        </span>
+                                                      </button>
+                                                    )}
                                                     {level3Item.children.map(
                                                       (level4Item) => (
                                                         <li
