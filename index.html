@@ -2,9 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <link rel="apple-touch-icon" href="images/logo192.png" />
+    <link rel="manifest" href="manifest.json" />
+    <title>RBNZ header</title>
 
     <!-- font awesome -->
     <link
@@ -22,7 +24,6 @@
     />
   </head>
   <body>
-
     <!-- endpoints mock data script -->
     <script data-config-id="endpoints" type="application/json">
       {
@@ -32,6 +33,20 @@
     </script>
 
     <div id="root"></div>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("./serviceWorker.js")
+            .then((register) => {
+              console.log("service worker registered");
+            })
+            .catch((error) => {
+              console.log("error", error);
+            });
+        });
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
