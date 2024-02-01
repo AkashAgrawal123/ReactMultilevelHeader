@@ -3,7 +3,7 @@ import "./Styles/App.scss";
 import Navbar from "./Components/Navbar";
 import Homepage from "./Components/Homepage";
 // import ImageZoom from "./Components/ImageZoom";
-import One from "./Mock/One";
+import AxiosMockComponent from "./Mock/AxiosMockComponent";
 
 const App = () => {
   return (
@@ -11,7 +11,7 @@ const App = () => {
       <Navbar />
       <Homepage />
       {/* <ImageZoom /> */}
-      {/* <One /> */}
+      {/* <AxiosMockComponent /> */}
     </>
   );
 };
