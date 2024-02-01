@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "./axiosMockAdapter";
 
-const YourReactComponent = () => {
+const AxiosMockComponent = () => {
   const [data, setData] = useState([]);
 
   const endpointsData = JSON.parse(
@@ -40,4 +40,4 @@ const YourReactComponent = () => {
   );
 };
 
-export default YourReactComponent;
+export default AxiosMockComponent;
