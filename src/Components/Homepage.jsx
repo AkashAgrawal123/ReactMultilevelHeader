@@ -1,4 +1,3 @@
-import React from "react";
 import "../Styles/Homepage.scss";
 import { IoSearchOutline } from "react-icons/io5";
 import { CgClose } from "react-icons/cg";

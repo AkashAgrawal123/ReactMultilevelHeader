@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../Styles/ImageZoom.scss";
 
 const ImageZoom = () => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import "../Styles/Navbar.scss";
 import axios from "../Mock/axiosMockAdapter";
 import { RxHamburgerMenu } from "react-icons/rx";
@@ -24,8 +24,8 @@ const Navbar = () => {
   const [curActiveArray, setCurActiveArray] = useState([]);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [navData, setNavData] = useState([]);
-  const [curPageIndex, setCurPageIndex] = useState(null);
-  const [activePageData, setActivePageData] = useState(null);
+  // const [curPageIndex, setCurPageIndex] = useState(null);
+  // const [activePageData, setActivePageData] = useState(null);
 
   const endpointsData = JSON.parse(
     document.querySelector('script[data-config-id="endpoints"]').textContent
@@ -38,7 +38,7 @@ const Navbar = () => {
   const isDesktopDesign = 992;
   const desktopInnerWidth = window.innerWidth;
 
-  const safePanelHeight = window.innerHeight - 71;
+  // const safePanelHeight = window.innerHeight - 71;
 
   const rootElement = document.querySelector("#root");
 
@@ -77,8 +77,8 @@ const Navbar = () => {
     }
   };
 
-  const handleBackButtonItemClick = (e) => {
-    console.log("clicke");
+  const handleBackButtonItemClick = () => {
+    console.log("click");
   };
 
   const handleMainMenuItemClick = (mainMenuItemId) => {
@@ -136,21 +136,21 @@ const Navbar = () => {
     return { transform: `translateX(${transformLeft}%)` };
   };
 
-  const mobileNavPositionTransform = () => {
-    const transformLeft = `${curActiveArray.length * -100}`;
-    return { transform: `translateX(${transformLeft}%)` };
-  };
+  // const mobileNavPositionTransform = () => {
+  //   const transformLeft = `${curActiveArray.length * -100}`;
+  //   return { transform: `translateX(${transformLeft}%)` };
+  // };
 
-  const desktopNavPositionTransform = () => {
-    if (!isSidebarMinimised) {
-      return { transform: `translateX(0)` };
-    }
+  // const desktopNavPositionTransform = () => {
+  //   if (!isSidebarMinimised) {
+  //     return { transform: `translateX(0)` };
+  //   }
 
-    const leftFactor = curActiveArray.length + 1;
+  //   const leftFactor = curActiveArray.length + 1;
 
-    const transformLeft = `${leftFactor * -100}`;
-    return { transform: `translateX(${transformLeft}%)` };
-  };
+  //   const transformLeft = `${leftFactor * -100}`;
+  //   return { transform: `translateX(${transformLeft}%)` };
+  // };
 
   const handleOverlayClick = (e) => {
     const clickOutsideSidebar =
